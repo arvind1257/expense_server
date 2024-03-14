@@ -1,6 +1,6 @@
 import  jwt  from "jsonwebtoken"
 import bcrypt from "bcryptjs"
-import User from "../modules/users.js"
+import User from "../Modules/users.js"
 import { encrypt,decrypt,copyObject } from "./security.js"
 
 export const usertype = async(req,res) => {
