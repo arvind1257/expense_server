@@ -52,45 +52,23 @@ export const signup = async(req,res) => {
 
 export const login = async(req,res) => {
     const { email , password } = req.body;
-    User.find({ email: email }).exec()
-        .then(docs => {
-            if (docs.length < 1) {
-                res.status(401).json({
-                    message: "UserID Not Found"
-                });
-            } else {
-                bcrypt.compare(password, docs[0].password, (err, response) => {
-                    if (err) {
-                        res.status(401).json({
-                            message: "Invalid UserID and Password"
-                        });
-                    }
-                    if (response) {
-                        var token = jwt.sign({
-                            email: docs[0].email,
-                            _id: docs[0]._id
-                        },"Security_Key", {
-                            expiresIn: "24h"
-                        });
-                        let respond = copyObject(docs[0])
-                        console.log(respond.cash,respond.acc)
-                        res.status(200).json({
-                            message: "Auth Successful",
-                            docs: respond,
-                            token: token
-                        });
-                        
-                    } else {
-                        res.status(401).json({
-                            message: "Invalid UserID and Password"
-                        });
-                    }
-                })
-            }
-        }).catch(err => {
-            res.status(500).json({
-                error: err
-            })
-        });
+    console.log({ email , password })
+    try{
+       const ex = await User.findOne({email});
+        if(!ex)
+        {
+            return res.status(401).json({ message:"User Doesn't Exists.",status:"Error"})
+        }
+        const isPass = await bcrypt.compare(password,ex.password)
+        if(!isPass){
+            return res.status(401).json({ message:"Invalid Credentials",status:"Error" })
+        }
+        let ex1 = copyObject(ex);
+        const token = jwt.sign({ email:ex.email,id:ex._id},"test",{expiresIn:"24h"})
+        res.status(200).json({result:ex1,token})
+    }
+    catch(err){
+        console.log(err)
+    }
     
 } 
