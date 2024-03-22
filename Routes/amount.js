@@ -1,9 +1,8 @@
 import Express from "express";
-import { login, signup, usertype} from "../Controllers/users.js"
+import { customAmounts} from "../Controllers/amount.js"
+import {CheckAuth} from "../Middlewares/CheckAuth.js"
 const router = Express.Router();
 
-router.post('/signup',signup)
-router.post('/login',login)
-router.post('/usertype',usertype)
+router.post('/custom',CheckAuth,customAmounts)
 
 export default router;

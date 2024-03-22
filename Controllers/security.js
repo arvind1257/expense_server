@@ -21,7 +21,7 @@ export function decrypt(text) {
     return decrypted.toString();
 }
 
-export function copyObject(data) {
+export function copyUserObject(data) {
     var ex1 = {};
         ex1._id = data._id;
         ex1.fname = data.fname;
@@ -32,8 +32,11 @@ export function copyObject(data) {
         ex1.userType = data.userType;
         ex1.cashType = data.cashType;
         ex1.joinedOn = data.joinedOn;
-        ex1.cash = decrypt(data.cash);
-        ex1.acc = decrypt(data.acc);
         ex1.message = data.message;
+        ex1.category = data.category;
+        ex1.type = data.type;
+        ex1.method = data.method.map((item)=>{
+            return {name:item.name,type:item.type,bank:item.bank?item.bank:"",amount:decrypt(item.amount)}
+        })
         return ex1;
 }

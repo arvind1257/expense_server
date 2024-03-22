@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema({
+    _id:mongoose.Schema.Types.ObjectId,
     fname :{type:String, required:true},
     lname :{type:String, required:true},
     gender :{type:String, required:true},
@@ -9,22 +10,24 @@ const userSchema = mongoose.Schema({
     userType :{type:String, default:"Free user"},
     joinedOn :{type:String, default:Date.now}, 
     cashType :{type:String, default:"₹"},
-    cash :{
-        key:{type:Buffer,required:true},
-        iv :{type:String,required:true},
-        encode :{type:String,required:true}
-    },
-    acc :{
-        key:{type:Buffer,required:true},
-        iv :{type:String,required:true},
-        encode :{type:String,required:true}
-    },
+    method :[{
+        name:{type:String, required:true},
+        type:{type:String,required:true},
+        bank:{type:String},
+        amount:{
+            key:{type:Buffer,required:true},
+            iv :{type:String,required:true},
+            encode :{type:String,required:true}
+        }
+    }],
+    type :{type:[String]},
     message: [
         {
             mess:{type:String},
             postedOn:{type:Date,default:new Date()}
         }
     ],
+    category: {type:[String]}
 })
 
 export default mongoose.model("User",userSchema)
