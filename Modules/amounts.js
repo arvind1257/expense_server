@@ -21,8 +21,7 @@ const amountSchema = mongoose.Schema({
     date :{type:Date,required:true},
     method :{
         name:{type:String,required:true},
-        type:{type:String,required:true},
-        bank:{type:String}  
+        type:{type:String,required:true} 
     },
     category :{type:String,required:true},
     

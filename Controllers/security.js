@@ -36,7 +36,7 @@ export function copyUserObject(data) {
         ex1.category = data.category;
         ex1.type = data.type;
         ex1.method = data.method.map((item)=>{
-            return {name:item.name,type:item.type,bank:item.bank?item.bank:"",amount:decrypt(item.amount)}
+            return {name:item.name,type:item.type,amount:decrypt(item.amount)}
         })
         return ex1;
 }
