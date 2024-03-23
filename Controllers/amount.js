@@ -31,8 +31,6 @@ export const customAmounts = async (req, res) => {
                     method:{
                         name: items.method.name,
                         type: items.method.type,
-                        bank: items.method.bank ,
-                        displayName: items.method.type==="BANK" ? items.method.bank+"-"+items.method.name : items.method.name,
                     },
                     category:items.category
                 }

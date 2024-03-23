@@ -13,14 +13,16 @@ const userSchema = mongoose.Schema({
     method :[{
         name:{type:String, required:true},
         type:{type:String,required:true},
-        bank:{type:String},
         amount:{
             key:{type:Buffer,required:true},
             iv :{type:String,required:true},
             encode :{type:String,required:true}
         }
     }],
-    type :{type:[String]},
+    type :[{
+        name:{type:String},
+        type:{type:String},
+    }],
     message: [
         {
             mess:{type:String},
