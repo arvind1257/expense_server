@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const amountSchema = mongoose.Schema({
-    _id:mongoose.Schema.Types.ObjectId,
     userId :
         {
             type:String,
