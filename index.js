@@ -10,6 +10,12 @@ import noteRoutes from "./Routes/notes.js"
 import reportRoutes from "./Routes/reports.js"
 
 const app = Express();
+const corsOptions ={
+    origin:'http://localhost:3000', 
+    credentials:true,            //access-control-allow-credentials:true
+    optionSuccessStatus:200
+}
+app.use(Cors(corsOptions));
 app.use(morgan("dev")); 
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true })); 
@@ -33,6 +39,8 @@ app.use((req, res, next) => {
     next(error);
 });
 app.use((error, req, res, next) => {
+     console.log(error)
+    console.log("error1")
     res.status(error.status || 500);
     res.json({
         error: {

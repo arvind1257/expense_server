@@ -27,7 +27,7 @@ export function copyUserObject(data) {
         ex1.fname = data.fname;
         ex1.lname = data.lname;
         ex1.gender = data.gender;
-        ex1.email = data.gender;
+        ex1.email = data.email;
         ex1.password = data.password;
         ex1.userType = data.userType;
         ex1.cashType = data.cashType;
@@ -36,7 +36,7 @@ export function copyUserObject(data) {
         ex1.category = data.category;
         ex1.type = data.type;
         ex1.method = data.method.map((item)=>{
-            return {name:item.name,type:item.type,amount:decrypt(item.amount)}
+            return {_id:item._id,name:item.name,type:item.type,amount:decrypt(item.amount)}
         })
         return ex1;
 }

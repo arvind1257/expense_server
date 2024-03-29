@@ -4,6 +4,7 @@ import User from "../Modules/user.js";
 import date from 'date-and-time';
 import { copyUserObject,decrypt,encrypt } from "./security.js";
 import amounts from "../Modules/amounts.js";
+import bank from "../Modules/bankList.js";
 
 export const customAmounts = async (req, res) => {
   const {from,to} = req.body;
@@ -119,6 +120,17 @@ export const deleteAmounts = async (req, res) => {
         res.status(200).json(temp_user);
 
     }catch(err){
+        console.log(err)
+    }
+}
+
+export const bankList = async(req,res) =>{
+    try{
+        const list = await bank.find();
+        console.log(list)
+        res.status(200).json(list)
+    }
+    catch(err){
         console.log(err)
     }
 }
