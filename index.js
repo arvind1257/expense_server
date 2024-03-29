@@ -10,11 +10,15 @@ import noteRoutes from "./Routes/notes.js"
 import reportRoutes from "./Routes/reports.js"
 
 const app = Express();
-const corsOptions ={
+const corsOptions =[{
     origin:'http://localhost:3000', 
     credentials:true,            //access-control-allow-credentials:true
     optionSuccessStatus:200
-}
+},{
+    origin:'https://my-expense-tracker-net.netlify.app',
+    credentials:true,
+    optionSuccessStatus:200
+}]
 app.use(Cors(corsOptions));
 app.use(morgan("dev")); 
 app.use(bodyParser.json()); 
