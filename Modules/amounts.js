@@ -18,12 +18,10 @@ const amountSchema = mongoose.Schema({
     },
     type :{type:String,required:true},
     date :{type:Date,required:true},
-    method :{
-        name:{type:String,required:true},
-        type:{type:String,required:true} 
-    },
+    method :{type:String,required:true},
     category :{type:String,required:true},
+    PostedOn :{type:Date,default:new Date()},
     
 })
 
-export default mongoose.model("Amounts",amountSchema)
+export default mongoose.model("Amounts",amountSchema,"new_amounts")

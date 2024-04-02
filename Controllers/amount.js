@@ -10,10 +10,8 @@ export const customAmounts = async (req, res) => {
   const {from,to} = req.body;
     const fromDate = new Date(from);
     const toDate = new Date(to);
-    fromDate.setHours(0,0,0,0);
-    toDate.setHours(0,0,0,0);
     try{
-        const ex = await amounts.find({userId:req.userData.id,date:{$gte:fromDate,$lte:toDate}}).sort({date:-1});
+        const ex = await amounts.find({userId:req.userData.id,date:{$gte:fromDate,$lte:toDate}}).sort({date:-1,PostedOn:-1});
         const user = await User.findOne({_id:req.userData.id});
         var ex1 = [];
         ex.map((items) => {
@@ -26,17 +24,13 @@ export const customAmounts = async (req, res) => {
                         amount:decrypt(items.amount),
                         display:user.cashType+decrypt(items.amount)
                     },
-                    type:items.type,
+                    type:user.type.filter((item1)=>item1._id==items.type).map((item1)=>{return {name:item1.name,type:item1.type,Status:item1.Status}})[0],
                     date:date.format(items.date, 'ddd, MMM DD YYYY'),
-                    method:{
-                        name: items.method.name,
-                        type: items.method.type,
-                    },
+                    method:user.method.filter((item1)=>item1._id==items.method).map((item1)=>{return {name:item1.name,type:item1.type}})[0],
                     category:items.category
                 }
             )
         })
-        
         res.status(200).json(ex1)
     }catch(err){
         console.log(err)
@@ -47,21 +41,18 @@ export const customAmounts = async (req, res) => {
 export const addAmounts = async (req, res) => {
     const {item,amount,date,category,method,type} = req.body;
       try{
+        const user = await User.findOne({_id:req.userData.id})
+        let temp_user = copyUserObject(user);
         await amounts.create({
             userId:req.userData.id,
             note:encrypt(item.toString()),
             amount:encrypt(amount.toString()),
             date:new Date(date),
             category:category,
-            method:{
-                name:method,
-                type:method!=="Cash"?"Bank":"Cash"
-                },
-            type:type
+            method:user.method[user.method.findIndex((x)=>x.name===method && x.Status==="Active")]._id,
+            type:user.type[user.type.findIndex((x)=>x.name===type && x.Status!=="Inactive")]._id,
         });
-        
-        const user = await User.findOne({_id:req.userData.id});
-        let temp_user = copyUserObject(user);
+    
         let index = 0;
 
         temp_user.method.map((item,i)=>{
@@ -71,7 +62,8 @@ export const addAmounts = async (req, res) => {
         })
 
         let amt = 0;
-        if(type!=="Income") amt = parseInt(temp_user.method[index].amount)-parseInt(amount)
+        let test = user.type.filter((item)=>item.name===type)[0]
+        if(test.type==="Expense" || test.type==="Settlement Expense" || test.name!=="Settlement") amt = parseInt(temp_user.method[index].amount)-parseInt(amount)
         else amt = parseInt(temp_user.method[index].amount)+parseInt(amount)
         
         await User.updateOne({_id:req.userData.id,"method.name":method},{$set:{"method.$.amount":encrypt(amt.toString())}})
@@ -89,16 +81,25 @@ export const editAmounts = async (req, res) => {
     const {item,amount,date,category,method,type} = req.body;
     try{
         const ex = await amounts.findOne({_id:id})
-        let amt = parseInt(amount);
-        if(parseInt(decrypt(ex.amount))!==parseInt(amount)){
-            const user = await User.findOne({_id:req.userData.id})
-            let temp_user = copyUserObject(user);
-            amt = parseInt(temp_user.method.filter((item)=>item.name===method).map((item)=>{return item.amount})[0]) + parseInt(decrypt(ex.amount)) - amt
-            await User.updateOne({_id:req.userData.id,"method.name":method},{"method.$.amount":encrypt(amt.toString())})
-        }
-        await amounts.updateOne({_id:id},{note:encrypt(item),amount:encrypt(amount.toString()),date:new Date(date),category:category,type:type})
         const user = await User.findOne({_id:req.userData.id})
         let temp_user = copyUserObject(user);
+        let amt = parseInt(amount);
+        if(parseInt(decrypt(ex.amount))!==parseInt(amount)){
+            if(temp_user.type[temp_user.type.findIndex((x)=>x.name===type)].type!=="Income")
+                amt = parseInt(temp_user.method.filter((item)=>item.name===method).map((item)=>{return item.amount})[0]) + parseInt(decrypt(ex.amount)) - amt
+            else
+                amt = parseInt(temp_user.method.filter((item)=>item.name===method).map((item)=>{return item.amount})[0]) - parseInt(decrypt(ex.amount)) + amt
+            await User.updateOne({_id:req.userData.id,"method.name":method},{"method.$.amount":encrypt(amt.toString())})
+        }
+        await amounts.updateOne({_id:id},{
+            note:encrypt(item),
+            amount:encrypt(amount.toString()),
+            date:new Date(date),
+            category:category,
+            type:temp_user.type[temp_user.type.findIndex((x)=>x.name===type)]._id,
+        })
+        const user1 = await User.findOne({_id:req.userData.id})
+        temp_user = copyUserObject(user1);
         res.status(200).json(temp_user);
 
     }catch(err){
@@ -127,10 +128,27 @@ export const deleteAmounts = async (req, res) => {
 export const bankList = async(req,res) =>{
     try{
         const list = await bank.find();
-        console.log(list)
         res.status(200).json(list)
     }
     catch(err){
+        console.log(err)
+    }
+}
+
+export const settlement = async(req,res) => {
+    const {_id,item,amount,type,date,method,category} = req.body
+    try{
+        const user = await User.findOne({_id:req.userData.id})
+        const Amounts = await amounts.findOne({_id});
+        console.log({_id,item,amount,type,date,method,category})
+        console.log(Amounts)
+        let temp_note=decrypt(Amounts.note)+"(paid on "+date+")";
+        await amounts.updateOne({_id},{
+            note:encrypt(temp_note),
+            type:user.type[user.type.findIndex((x)=>x.name==="Paid" && x.Status===null)]._id,
+        })
+        addAmounts(req,res)
+    }catch(err){
         console.log(err)
     }
 }

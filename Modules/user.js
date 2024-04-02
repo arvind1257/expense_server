@@ -16,18 +16,22 @@ const userSchema = mongoose.Schema({
             key:{type:Buffer,required:true},
             iv :{type:String,required:true},
             encode :{type:String,required:true}
-        }
+        },
+        Status:{type:String,default:"Active"}
     }],
     type :[{
         name:{type:String},
         type:{type:String},
+        Status:{type:String,default:"Active"}
     }],
-    message: [
-        {
-            mess:{type:String},
-            postedOn:{type:Date,default:new Date()}
-        }
-    ],
+    message: [{
+        mess:{
+            key:{type:Buffer,required:true},
+            iv :{type:String,required:true},
+            encode :{type:String,required:true}
+        },
+        postedOn:{type:Date,default:new Date()}
+    }],
     category: {type:[String]}
 })
 

@@ -34,8 +34,8 @@ export function copyUserObject(data) {
         ex1.joinedOn = data.joinedOn;
         ex1.message = data.message;
         ex1.category = data.category;
-        ex1.type = data.type;
-        ex1.method = data.method.map((item)=>{
+        ex1.type = data.type.filter((item)=>item.Status==="Active");
+        ex1.method = data.method.filter((item)=>item.Status==="Active").map((item)=>{
             return {_id:item._id,name:item.name,type:item.type,amount:decrypt(item.amount)}
         })
         return ex1;
