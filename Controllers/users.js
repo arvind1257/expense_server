@@ -58,7 +58,8 @@ export const exchange = async(req,res) => {
             date:new Date(date),
             category:"None",
             method:ex.method[ex.method.findIndex((x)=>x.name===to)]._id,
-            type:ex.type[ex.type.findIndex((x)=>x.name==="Exchange" && x.Status===null)]._id
+            type:ex.type[ex.type.findIndex((x)=>x.name==="Exchange" && x.Status===null)]._id,
+            PostedOn:new Date()
         });
         
         const ex1 = await User.findOne({_id:req.userData.id})

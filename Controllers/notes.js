@@ -1,10 +1,10 @@
 import User from "../Modules/user.js";
-import { copyUserObject } from "./security.js";
+import { copyUserObject,encrypt } from "./security.js";
 
 export const addMessage = async (req, res) => {
     const {message} = req.body
     try{
-        await User.findByIdAndUpdate(req.userData.id,{$addToSet:{"message":[{"mess":message,"postedOn":new Date()}]}});
+        await User.findByIdAndUpdate(req.userData.id,{$addToSet:{"message":[{"mess":encrypt(message),"postedOn":new Date()}]}});
         const user = await User.findOne({_id:req.userData.id})
         let temp_user = copyUserObject(user);
         res.status(200).json(temp_user);

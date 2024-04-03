@@ -32,7 +32,9 @@ export function copyUserObject(data) {
         ex1.userType = data.userType;
         ex1.cashType = data.cashType;
         ex1.joinedOn = data.joinedOn;
-        ex1.message = data.message;
+        ex1.message = data.message.map((item)=>{
+            return {_id:item._id,mess:decrypt(item.mess),postedOn:item.postedOn}
+        });
         ex1.category = data.category;
         ex1.type = data.type.filter((item)=>item.Status==="Active");
         ex1.method = data.method.filter((item)=>item.Status==="Active").map((item)=>{

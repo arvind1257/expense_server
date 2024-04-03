@@ -51,6 +51,7 @@ export const addAmounts = async (req, res) => {
             category:category,
             method:user.method[user.method.findIndex((x)=>x.name===method && x.Status==="Active")]._id,
             type:user.type[user.type.findIndex((x)=>x.name===type && x.Status!=="Inactive")]._id,
+            PostedOn:new Date(),
         });
     
         let index = 0;
@@ -63,9 +64,10 @@ export const addAmounts = async (req, res) => {
 
         let amt = 0;
         let test = user.type.filter((item)=>item.name===type)[0]
-        if(test.type==="Expense" || test.type==="Settlement Expense" || test.name!=="Settlement") amt = parseInt(temp_user.method[index].amount)-parseInt(amount)
+        console.log(test)
+        if(test.type==="Expense" || test.type==="Settlement Expense" || test.name==="Pay Out") amt = parseInt(temp_user.method[index].amount)-parseInt(amount)
         else amt = parseInt(temp_user.method[index].amount)+parseInt(amount)
-        
+        console.log(amt)
         await User.updateOne({_id:req.userData.id,"method.name":method},{$set:{"method.$.amount":encrypt(amt.toString())}})
         const user1 = await User.findOne({_id:req.userData.id});
         temp_user = copyUserObject(user1);
@@ -113,8 +115,14 @@ export const deleteAmounts = async (req, res) => {
         const ex = await amounts.findOne({_id:id})
         const user = await User.findOne({_id:req.userData.id})
         let temp_user = copyUserObject(user);
-        let amt = parseInt(temp_user.method.filter((item)=>item.name===ex.method.name).map((item)=>{return item.amount})[0]) + parseInt(decrypt(ex.amount))
-        await User.updateOne({_id:req.userData.id,"method.name":ex.method.name},{"method.$.amount":encrypt(amt.toString())})
+        let test = temp_user.type.filter((item)=>item._id==ex.type)[0]
+        let amt = parseInt(temp_user.method.filter((item)=>item._id==ex.method).map((item)=>{return item.amount})[0])
+        if(test.type==="Expense" || test.type==="Settlement Expense")
+            amt += parseInt(decrypt(ex.amount))
+        else if(test.type==="Income")
+            amt -= parseInt(decrypt(ex.amount))
+        await User.updateOne({_id:req.userData.id,"method.name":temp_user.method.filter((item)=>item._id==ex.method)[0].name},{"method.$.amount":encrypt(amt.toString())})
+        console.log(amt)
         await amounts.deleteOne({_id:id})
         const user1 = await User.findOne({_id:req.userData.id})
         temp_user = copyUserObject(user1);
