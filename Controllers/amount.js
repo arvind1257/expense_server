@@ -15,19 +15,41 @@ export const customAmounts = async (req, res) => {
         const user = await User.findOne({_id:req.userData.id});
         var ex1 = [];
         ex.map((items) => {
+            let sum = 0;
+            let type1 = items.type;
+            let amt = parseInt(decrypt(items.amount))
+            if(items.payments.length>0){
+                items.payments.map((pay)=>{
+                    sum+=parseInt(decrypt(pay.amount))
+                })
+            }
+            if(sum===amt){
+                type1=user.type.filter((item1)=>item1.name==="Paid" && item1.Status===null)[0]._id
+            }
+            if(sum>0 && sum<amt){
+                amt-=sum;
+            }
             ex1.push(
                 {
                     _id:items._id,
                     userId:items.userId,
                     note:decrypt(items.note),
                     amount:{
-                        amount:decrypt(items.amount),
-                        display:user.cashType+decrypt(items.amount)
+                        amount:amt,
+                        display:user.cashType+amt
                     },
-                    type:user.type.filter((item1)=>item1._id==items.type).map((item1)=>{return {name:item1.name,type:item1.type,Status:item1.Status}})[0],
+                    type:user.type.filter((item1)=>item1._id==type1).map((item1)=>{return {name:item1.name,type:item1.type,_id:item1._id}})[0],
                     date:date.format(items.date, 'ddd, MMM DD YYYY'),
                     method:user.method.filter((item1)=>item1._id==items.method).map((item1)=>{return {name:item1.name,type:item1.type}})[0],
-                    category:items.category
+                    category:items.category,
+                    payments:items.payments.map((pay)=>{
+                        return{ 
+                            date:date.format(pay.date, 'ddd, MMM DD YYYY'),
+                            method:user.method.filter((item1)=>item1._id==pay.method).map((item1)=>{return {name:item1.name,type:item1.type,_id:item1._id}})[0],
+                            amount:decrypt(pay.amount),
+                            _id:pay._id,
+                        }
+                    })
                 }
             )
         })

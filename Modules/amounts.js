@@ -20,6 +20,15 @@ const amountSchema = mongoose.Schema({
     date :{type:Date,required:true},
     method :{type:String,required:true},
     category :{type:String,required:true},
+    payments:[{
+        date:{type:Date},
+        method:{type:String},
+        amount :{
+            key:{type:Buffer,required:true},
+            iv :{type:String,required:true},
+            encode :{type:String,required:true}
+        }
+    }],
     PostedOn :{type:Date,default:new Date()},
     
 })

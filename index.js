@@ -5,7 +5,7 @@ import Cors from "cors";
 import bodyParser from "body-parser";
 import userRoutes from "./Routes/users.js"
 import amountRoutes from "./Routes/amount.js"
-import groupRoutes from "./Routes/gpamount.js"
+import settlementRoutes from "./Routes/settlement.js"
 import noteRoutes from "./Routes/notes.js"
 import reportRoutes from "./Routes/reports.js"
 
@@ -34,7 +34,7 @@ app.get('/',(req,res) => {
 app.use('/user',userRoutes)
 app.use('/amount',amountRoutes)
 app.use('/note',noteRoutes)
-app.use('/groupamount',groupRoutes)
+app.use('/settle',settlementRoutes)
 app.use('/report',reportRoutes)
 
 app.use((req, res, next) => {
